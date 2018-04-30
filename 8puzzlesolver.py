@@ -26,3 +26,41 @@ class Node:
 
     def __lt__(self, other):
         return self.map < other.map
+
+def uninformed_search(init_state,type="depth"):
+
+    FRONTIER_SIZE_LIMIT = 0
+    SEARCH_DEPTH_LIMIT = 0
+
+    # select between dfs and bfs -- the only difference is stack/queue usage!
+    data_structure = None
+    if(type is "depth"):
+        explored_set, data_structure = set(), list([Node(init_state, None, None, 0, 0, 0)])
+    else:
+        explored_set, data_structure = set(), deque([Node(init_state, None, None, 0, 0, 0)])
+
+
+    while data_structure:
+        if(type is "depth"):
+            node = data_structure.pop()
+        else:
+            node = data_structure.popleft()
+
+        explored_set.add(node.map)
+
+        # if this is the goal, we're done! quit!
+        if node.state == GOAL_STATE:
+            return data_structure, node
+
+        neighbors = reversed(generate_neighbours(node))
+        for neighbor in neighbors:
+            if neighbor.map not in explored_set:
+                data_structure.append(neighbor)
+                explored_set.add(neighbor.map)
+
+                # if we're depth limited
+                if neighbor.depth > SEARCH_DEPTH_LIMIT:
+                    SEARCH_DEPTH_LIMIT += 1
+
+        if len(data_structure) > FRONTIER_SIZE_LIMIT:
+            FRONTIER_SIZE_LIMIT = len(data_structure)
