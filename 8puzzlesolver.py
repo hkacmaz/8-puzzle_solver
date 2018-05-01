@@ -64,3 +64,56 @@ def uninformed_search(init_state,type="depth"):
 
         if len(data_structure) > FRONTIER_SIZE_LIMIT:
             FRONTIER_SIZE_LIMIT = len(data_structure)
+
+
+def a_star_search(init_state,heuristic="manhattan"):
+
+    explored_set, heap, heap_entry, counter = set(), list(), {}, itertools.count()
+
+    FRONTIER_SIZE_LIMIT = 0
+    SEARCH_DEPTH_LIMIT = 0
+
+    #if(heuristic is "misplaced tiles"):
+    key = displaced_tiles_h(init_state)
+    #else:
+    #    pass
+
+    # set up our starting positions
+    root_node = Node(init_state, None, None, 0, 0, key)
+    first_entry = (key, 0, root_node)
+    heappush(heap, first_entry)
+    heap_entry[root_node.map] = first_entry
+
+    while heap:
+        node = heappop(heap)
+        explored_set.add(node[2].map)
+        if node[2].state == GOAL_STATE:
+            return heap,node[2]
+
+        neighbors = generate_neighbours(node[2])
+
+        for neighbor in neighbors:
+            heuristic_value = 0
+            if(heuristic is "manhattan"):
+                heuristic_value = manhattan_distance_h(neighbor.state)
+            else:
+                heuristic_value = displaced_tiles_h(neighbor.state)
+            neighbor.id = neighbor.cost + heuristic_value
+            next_entry = (neighbor.id, neighbor.move, neighbor)
+            if neighbor.map not in explored_set:
+                heappush(heap, next_entry)
+                explored_set.add(neighbor.map)
+                heap_entry[neighbor.map] = next_entry
+                if neighbor.depth > SEARCH_DEPTH_LIMIT:
+                    SEARCH_DEPTH_LIMIT += 1
+            elif neighbor.map in heap_entry and neighbor.id < heap_entry[neighbor.map][2].id:
+                hindex = heap.index((heap_entry[neighbor.map][2].id,
+                                     heap_entry[neighbor.map][2].move,
+                                     heap_entry[neighbor.map][2]))
+
+                heap[int(hindex)] = next_entry
+                heap_entry[neighbor.map] = next_entry
+                heapify(heap)
+
+        if len(heap) > FRONTIER_SIZE_LIMIT:
+            FRONTIER_SIZE_LIMIT = len(heap)
