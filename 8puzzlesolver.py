@@ -131,3 +131,30 @@ def iterative_deepening_search(init_state):
             break
         threshold = response
         costs = set()
+
+
+def depth_limited_dfs(init_state, threshold):
+    explored_set, stack = set(), list([Node(init_state, None, None, 0, 0, threshold)])
+    FRONTIER_SIZE_LIMIT = 0
+    SEARCH_DEPTH_LIMIT = 0
+    X=0
+    costs = set()
+    while stack:
+        node = stack.pop()
+        explored_set.add(node.map)
+        if node.state == GOAL_STATE:
+            return stack,node
+        if node.id > threshold:
+            costs.add(node.id)
+        if node.depth < threshold:
+            neighbors = reversed(generate_neighbours(node))
+            for neighbor in neighbors:
+                if neighbor.map not in explored_set:
+                    neighbor.id = neighbor.cost + manhattan_distance_h(neighbor.state)
+                    stack.append(neighbor)
+                    explored_set.add(neighbor.map)
+                    if neighbor.depth > SEARCH_DEPTH_LIMIT:
+                        SEARCH_DEPTH_LIMIT += 1
+            if len(stack) > FRONTIER_SIZE_LIMIT:
+                FRONTIER_SIZE_LIMIT = len(stack)
+    return min(costs)
