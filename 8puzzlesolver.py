@@ -117,3 +117,17 @@ def a_star_search(init_state,heuristic="manhattan"):
 
         if len(heap) > FRONTIER_SIZE_LIMIT:
             FRONTIER_SIZE_LIMIT = len(heap)
+
+
+def iterative_deepening_search(init_state):
+    FRONTIER_SIZE_LIMIT = 0
+    SEARCH_DEPTH_LIMIT = 0
+    costs = set()
+    threshold = manhattan_distance_h(init_state)
+    while True: # hmm, any better way to do this?
+        response = depth_limited_dfs(init_state, threshold)
+        if type(response) is tuple: # yuck!!
+            return response
+            break
+        threshold = response
+        costs = set()
