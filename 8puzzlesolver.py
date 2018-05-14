@@ -158,3 +158,66 @@ def depth_limited_dfs(init_state, threshold):
             if len(stack) > FRONTIER_SIZE_LIMIT:
                 FRONTIER_SIZE_LIMIT = len(stack)
     return min(costs)
+
+
+    
+
+def generate_neighbours(node):
+    X=0
+    neighbors = []
+    neighbors.append(Node(generate_new_state(node.state, 1), node, 1, node.depth + 1, node.cost + 1, 0))
+    neighbors.append(Node(generate_new_state(node.state, 2), node, 2, node.depth + 1, node.cost + 1, 0))
+    neighbors.append(Node(generate_new_state(node.state, 3), node, 3, node.depth + 1, node.cost + 1, 0))
+    neighbors.append(Node(generate_new_state(node.state, 4), node, 4, node.depth + 1, node.cost + 1, 0))
+    nodes = [neighbor for neighbor in neighbors if neighbor.state]
+    return nodes
+
+
+def generate_new_state(state, position):
+    #X=x
+    candidate_state = state[:]
+    index = candidate_state.index(0)
+    if position == 1:  # North
+        if index not in range(0, BOARD_EDGE):
+            #X=X+1
+            temp = candidate_state[index - BOARD_EDGE]
+            candidate_state[index - BOARD_EDGE] = candidate_state[index]
+            candidate_state[index] = temp
+            #if X<3:
+            #    print(candidate_state)
+            return candidate_state
+        else:
+            return None
+    if position == 2:  # South
+        if index not in range(BOARD_LENGTH - BOARD_EDGE, BOARD_LENGTH):
+            #X=X+1
+            temp = candidate_state[index + BOARD_EDGE]
+            candidate_state[index + BOARD_EDGE] = candidate_state[index]
+            candidate_state[index] = temp
+            # if X<3:
+            #   print(candidate_state)
+            return candidate_state
+        else:
+            return None
+    if position == 3:  # West
+        if index not in range(0, BOARD_LENGTH, BOARD_EDGE):
+            #X=X+1
+            temp = candidate_state[index - 1]
+            candidate_state[index - 1] = candidate_state[index]
+            candidate_state[index] = temp
+            #if X<3:
+            #    print(candidate_state)
+            return candidate_state
+        else:
+            return None
+    if position == 4:  # East
+        if index not in range(BOARD_EDGE - 1, BOARD_LENGTH, BOARD_EDGE):
+            #X=X+1
+            temp = candidate_state[index + 1]
+            candidate_state[index + 1] = candidate_state[index]
+            candidate_state[index] = temp
+            #if X<3:
+            #    print(candidate_state)
+            return candidate_state
+        else:
+            return None
