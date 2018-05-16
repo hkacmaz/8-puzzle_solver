@@ -221,3 +221,63 @@ def generate_new_state(state, position):
             return candidate_state
         else:
             return None
+def displaced_tiles_h(state):
+
+    ## effectively a Hamming distance
+    displaced = 0
+    for goal,cur in zip(GOAL_STATE,state):
+        if goal != cur:
+            displaced += 1
+#    print("MINE:",displaced)
+    return displaced
+
+def manhattan_distance_h(state):
+    return sum(abs(b % BOARD_EDGE - g % BOARD_EDGE) + abs(b//BOARD_EDGE - g//BOARD_EDGE)
+               for b, g in ((state.index(i), GOAL_STATE.index(i)) for i in range(1, BOARD_LENGTH)))
+
+# dumb thing -- just follow the nodes back from the goal to the start state
+def extract_path(path,goal):
+    current_node = goal
+    moves = []
+
+    while START_STATE != current_node.state:
+        if current_node.move == 1:
+            movement = 'north'
+        elif current_node.move == 2:
+            movement = 'south'
+        elif current_node.move == 3:
+            movement = 'west'
+        else:
+            movement = 'east'
+        moves.insert(0, movement)
+        current_node = current_node.parent
+
+        # we've come to the end if we've found a node with no parent
+        if(current_node is None):
+            break
+
+
+    return moves
+
+def do_algorithm_eval(puzzles,algorithm):
+    print("START STATE","\t\t\t","NEXT STATE","\t\t","NEXT STATE+1","\t\t","PATH LENGTH","\t\t","NODE VISITS","\t\t","CPU TIME""\t\t")
+    for puzzle in puzzles:
+        path = None
+        START_STATE = puzzle
+        start = timeit.default_timer()
+        if(algorithm is "bfs"):
+            path,goal = uninformed_search(puzzle,type="breadth")
+        if(algorithm is "dfs"):
+            path,goal = uninformed_search(puzzle,type="depth")
+        if(algorithm is "ids"):
+            path,goal = iterative_deepening_search(puzzle)
+        if(algorithm is "asman"):
+            path,goal = a_star_search(puzzle,heuristic="manhattan")
+        if(algorithm is "asmis"):
+            path,goal = a_star_search(puzzle,heuristic="mispaced tiles")
+        stop = timeit.default_timer()
+
+        print("-"*16)
+        print(puzzle,"\t","\t\t\t","\t\t\t",len(extract_path(path,goal)),"\t\t\t",len(path),"\t\t\t",format(stop-start, '.2f')+"s")
+        print("-"*16)
+
