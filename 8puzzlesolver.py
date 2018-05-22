@@ -281,3 +281,57 @@ def do_algorithm_eval(puzzles,algorithm):
         print(puzzle,"\t","\t\t\t","\t\t\t",len(extract_path(path,goal)),"\t\t\t",len(path),"\t\t\t",format(stop-start, '.2f')+"s")
         print("-"*16)
 
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("puzzles")
+
+    args = parser.parse_args()
+    puzzles = []
+    with open(args.puzzles) as f:
+        for l in f:
+            p = l.strip().strip(" ").split(",")
+            p = [int(x) for x in p]
+            puzzles.append(p)
+
+    # begin the code to manage the experiments
+    breadth_first_search_puzzles = puzzles[:2]
+    depth_first_search_puzzles = puzzles[:2]
+
+    # iterative deepening - any 10 from the dataset
+    random.shuffle(puzzles)
+    iterative_deepening_search_puzzles = puzzles[:2]
+
+    # a star puzzles
+    random.shuffle(puzzles)
+    a_star_puzzles = puzzles[:2]
+
+    print("-"*16)
+    print("Algorithm: Breadth-First Search")
+    print("-"*16)
+    do_algorithm_eval(breadth_first_search_puzzles,algorithm="bfs")
+
+    print("\n")
+    print("-"*16)
+    print("Algorithm: Depth-First Search")
+    print("-"*16)
+    do_algorithm_eval(depth_first_search_puzzles,algorithm="dfs")
+
+    print("\n")
+    print("-"*16)
+    print("Algorithm: A* Search with Misplaced Tile Heuristic")
+    print("-"*16)
+    do_algorithm_eval(a_star_puzzles,algorithm="asmis")
+
+    print("\n")
+    print("-"*16)
+    print("Algorithm: A* Search with Manhattan Distance Heuristic")
+    print("-"*16)
+    do_algorithm_eval(a_star_puzzles,algorithm="asman")
+
+    print("\n")
+    print("-"*16)
+    print("Algorithm: Iterative Deepening Search")
+    print("-"*16)
+    do_algorithm_eval(iterative_deepening_search_puzzles,algorithm="ids")
